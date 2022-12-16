@@ -3,13 +3,10 @@
 
 chess_piece::chess_piece(piece_type_description piece_type, team_color color,
                          std::shared_ptr<board> board_,
-                         std::vector<int> new_location,
-                         std::shared_ptr<MainWindow> w)
+                         std::vector<int> new_location)
     : piece_type_(piece_type), color_(color) {
-  piece_ = std::make_shared<ClickableLabel>(w);
-  std::shared_ptr<ClickableLabel> square =
-      board_->squares[new_location[0]][new_location[1]];
-  piece_->setGeometry(square->geometry());
+
+
 //  QPixmap px = pixmap(piece_type, color);
 //  piece_->setPixmap(px);
 //  piece_->setScaledContents(true);

@@ -20,5 +20,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QMenu *fileMenu;
+     QAction *exitAct;
 };
 #endif // MAINWINDOW_H

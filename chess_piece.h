@@ -16,15 +16,13 @@ class chess_piece {
 
 public:
   chess_piece(piece_type_description piece_type, team_color color,
-              std::shared_ptr<board> board_, std::vector<int> new_location,
-              std::shared_ptr<MainWindow> w);
+              std::shared_ptr<board> board_, std::vector<int> new_location);
   ~chess_piece();
   void executeMove(std::vector<int> new_location,
                    std::shared_ptr<board> board_);
   piece_type_description piece_type_;
 
 private:
-  std::shared_ptr<ClickableLabel> piece_;
   team_color color_;
   bool checkMoveValid(std::vector<int> new_location);
 
@@ -32,6 +30,5 @@ private:
   bool alive_ = true;
   std::vector<int> location_ = {0, 0};
   int dir_;
-  QPixmap pixmap(piece_type_description piece_type,
-                 team_color color);
+
 };

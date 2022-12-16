@@ -5,17 +5,17 @@
 #include <QLabel>
 #include <QWidget>
 #include <Qt>
+#include <iostream>
 
-class ClickableLabel : public QLabel {
+class piece : public QLabel {
   Q_OBJECT
 
 public:
-  explicit ClickableLabel(std::shared_ptr<MainWindow> parent = Q_NULLPTR,
-                          Qt::WindowFlags f = Qt::WindowFlags(),QPixmap px=QPixmap(""),int x=0,int y=0,int w=0,int h=0);
-  ~ClickableLabel();
-  bool is_taken = false;
-
-
+  explicit piece(std::shared_ptr<MainWindow> parent = Q_NULLPTR,
+                          Qt::WindowFlags f = Qt::WindowFlags(),QPixmap px=QPixmap(""),QRect geo=QRect(0,0,0,0));
+  ~piece();
+  bool pressed=false;
+    int loc_x,loc_y;
 signals:
   void clicked();
 
@@ -23,16 +23,16 @@ protected:
   void mousePressEvent(QMouseEvent *event);
 };
 
+
+class square : public piece{
+public:
+    using piece::piece;
+    ~square(){
+     std::cout << "piece died" << std::endl;
+    }
+    std::shared_ptr<piece> piece_ = nullptr;
+
+private:
+};
+
 #endif // CLICKABLELABEL_H
-
-class square : public ClickableLabel{
-public:
-    using ClickableLabel::ClickableLabel;
-    std::shared_ptr<ClickableLabel> piece_ = nullptr;
-};
-
-class piece : public ClickableLabel{
-public:
-    using ClickableLabel::ClickableLabel;
-
-};

@@ -8,7 +8,6 @@ class chess{
 public:
     chess();
     ~chess();
-    void pressEvent(std::shared_ptr<ClickableLabel> square);
 
     int mainLoop();
 

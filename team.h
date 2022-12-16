@@ -5,7 +5,7 @@
 class team
 {
 public:
-    team(team_color color,std::shared_ptr<board> board_,std::shared_ptr<MainWindow> w);
+    team(team_color color,std::shared_ptr<board> board_);
 	~team();
 
 private:
