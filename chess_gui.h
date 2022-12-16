@@ -4,10 +4,10 @@
 #define CHESS_GUI_H
 
 #include "ClickableLabel.h"
-#include <QThread>
 
 
-class chess_gui {
+class chess_gui : public QWidget {
+    Q_OBJECT
 public:
   chess_gui(std::shared_ptr<MainWindow> w);
   void move(int x, int y, int new_x, int new_y);
@@ -22,6 +22,7 @@ private:
   std::shared_ptr<piece> w_team_[16];
   std::shared_ptr<piece> b_team_[16];
   bool pressed_=false;
+  void buttonClicked(int x_,int y_);
 
 };
 

@@ -1,5 +1,5 @@
 #include "chess_gui.h"
-
+#include <QObject>
 chess_gui::chess_gui(std::shared_ptr<MainWindow> w) {
     w_ = w;
 
@@ -17,7 +17,10 @@ chess_gui::chess_gui(std::shared_ptr<MainWindow> w) {
             }
             squares_[i][j] = std::make_shared<square>(
                         w, Qt::WindowFlags(), pixmap,
-                        QRect(i * 100 + 100, j * 100 + 50, 100, 100));
+                        QRect(i * 100 + 100, j * 100 + 50, 100, 100),i,j);
+
+           connect(squares_[i][j].get(), &square::clicked,
+                    this, &chess_gui::buttonClicked);
         }
     }
     initTeam(1,0);
@@ -50,7 +53,7 @@ void chess_gui::makePiece(int color,int idx,std::string pic_name,
     (*team)[idx] = std::make_shared<piece>(
                 w_, Qt::WindowFlags(),
                 QPixmap(dir.append(clr+pic_name+".png").c_str()),
-                pos->geometry());
+                pos->geometry(),x,y);
     pos->piece_ = (*team)[idx];
 }
 
@@ -66,37 +69,12 @@ void chess_gui::move(int x, int y, int new_x, int new_y){
 }
 
 
-std::vector<int>chess_gui::waitToPress(){
-    while(1){
+void chess_gui::buttonClicked(int x_,int y_){
+    std::cout << "x: " <<x_ << "\ty: " <<y_ << std::endl;
         int clicked=0;
-        for(auto& elem: w_team_)
-        {
-            if(elem->pressed){
-                squares_[elem->loc_x][elem->loc_y]->pressed=true;
-                elem->pressed=false;
-            }
-        }
-        for(auto& elem: b_team_)
-        {
-            if(elem->pressed){
-                squares_[elem->loc_x][elem->loc_y]->pressed=true;
-                elem->pressed=false;
-            }
-        }
-        for(auto& rows: squares_)
-        {
-            for(auto& elem: rows)
-            {
-                if(elem->pressed){
-                    clicked++;
-                    elem->pressed=false;
-                    elem->setStyleSheet("border: 50px; background-color:rgba(0,0,0,0%);");
-                }
-            }
-        }
         if (clicked==2){
-            break;
+
         }
-        QThread::msleep(10);
-    }
+
 }
+
