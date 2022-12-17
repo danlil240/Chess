@@ -3,6 +3,10 @@
 
 chess::chess() {}
 chess::~chess() {}
+
+void chess::firstPress(int x,int y){
+
+}
 // team_color turn=white;
 // int chess::mainLoop()
 //{

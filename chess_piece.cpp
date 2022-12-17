@@ -7,10 +7,6 @@ chess_piece::chess_piece(piece_type_description piece_type, team_color color,
     : piece_type_(piece_type), color_(color) {
 
 
-//  QPixmap px = pixmap(piece_type, color);
-//  piece_->setPixmap(px);
-//  piece_->setScaledContents(true);
-
   std::cout << color_ << piece_type << " born" << std::endl;
   dir_ = color_ * 2 - 1;
 }

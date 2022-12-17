@@ -13,6 +13,8 @@ public:
 
     bool init();
 
+    void firstPress(int x,int y);
+
     piece_type_description choosePiece();
 
     std::vector<int> choosePosition();
