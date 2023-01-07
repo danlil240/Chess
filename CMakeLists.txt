@@ -12,24 +12,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+include_directories(logic gui)
+
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        board.h
-        board.cpp
-        chess_piece.cpp
-        chess_piece.h
-        team.cpp
-        team.h
-        pics.qrc
-        clickablelabel.h
-        clickablelabel.cpp
-        chess.cpp
-        chess.h
-        chess_gui.cpp
-        chess_gui.h
+        gui/mainwindow.cpp
+        gui/mainwindow.h
+        gui/mainwindow.ui
+        logic/board.h
+        logic/board.cpp
+        logic/chess_piece.cpp
+        logic/chess_piece.h
+        gui/pics.qrc
+        gui/clickablelabel.h
+        gui/clickablelabel.cpp
+        logic/chess.cpp
+        logic/chess.h
+        gui/chess_gui.cpp
+        gui/chess_gui.h
 )
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtChess
@@ -50,6 +50,7 @@ else()
     else()
         add_executable(QtChess
             ${PROJECT_SOURCES}
+
         )
     endif()
 endif()
