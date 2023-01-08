@@ -1,6 +1,5 @@
 //#include "team.h"
 #include <QApplication>
-#include "Chess.h"
 #include "chess_gui.h"
 
 
@@ -11,7 +10,6 @@ struct data_pass{
 };
 
 int main(int argc, char *argv[]) {
-    chess chess;
     QApplication a(argc, argv);
     std::shared_ptr<MainWindow> main_window = std::make_shared<MainWindow>();
     std::shared_ptr<chess_gui> gui= std::make_shared<chess_gui>(main_window);

@@ -25,6 +25,8 @@ private:
   std::shared_ptr<piece> b_team_[16];
   std::shared_ptr<square> squre_pressed_ = nullptr;
   void buttonClicked(int x_, int y_);
+  std::vector< std::array<int, 2>> available_moves=std::vector< std::array<int, 2>>();
+bool checkAvailable(int x, int y);
 };
 
 #endif // CHESS_GUI_H

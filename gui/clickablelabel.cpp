@@ -11,7 +11,6 @@ piece::piece(std::shared_ptr<MainWindow> parent, Qt::WindowFlags f,QPixmap px,QR
     this->loc_x=x_;
     this->loc_y=y_;
     this->color=color_;
-    std::cout << "born" << std::endl;
 }
 
 piece::~piece() {}

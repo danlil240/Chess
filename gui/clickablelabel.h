@@ -33,7 +33,6 @@ class square : public piece{
 public:
     using piece::piece;
     ~square(){
-     std::cout << "piece died" << std::endl;
     }
     std::shared_ptr<piece> piece_ = nullptr;
 

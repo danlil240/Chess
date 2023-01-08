@@ -11,7 +11,7 @@ public:
 
     int mainLoop();
 
-    void firstPress(int x,int y,std::vector<int*> &available_moves);
+    void firstPress(int x,int y,std::vector< std::array<int, 2>> &available_moves);
 
     void secondPress(int new_x,int new_y);
 

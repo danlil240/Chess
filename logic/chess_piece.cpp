@@ -5,9 +5,8 @@ chess_piece::chess_piece(piece_type_description piece_type, team_color color,
                          int x, int y,int dir)
     : piece_type(piece_type), color(color), dir(dir){
 
-  std::cout << color << piece_type << " born" << std::endl;
 }
-chess_piece::~chess_piece() { std::cout << "dead" << std::endl; }
+chess_piece::~chess_piece() {}
 
 void chess_piece::executeMove(int new_location[2]) {
   location_[0] = new_location[0];
