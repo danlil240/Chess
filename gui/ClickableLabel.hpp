@@ -1,7 +1,7 @@
 #ifndef CLICKABLELABEL_H
 #define CLICKABLELABEL_H
 
-#include "mainwindow.h"
+#include "mainwindow.hpp"
 #include <QLabel>
 #include <QWidget>
 
@@ -28,11 +28,11 @@ protected:
 };
 
 
-class square : public piece{
+class gui_square : public piece{
     Q_OBJECT
 public:
     using piece::piece;
-    ~square(){
+    ~gui_square(){
     }
     std::shared_ptr<piece> piece_ = nullptr;
 

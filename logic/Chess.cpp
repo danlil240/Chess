@@ -13,7 +13,7 @@ void chess::firstPress(int x, int y,
 }
 
 void chess::secondPress(int new_x, int new_y) {
-    board_->updateSquares(new_x, new_y);
+//    board_->updateSquares(new_x, new_y);
 }
 
 team_color turn = white;

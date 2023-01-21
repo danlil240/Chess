@@ -1,4 +1,4 @@
-#include "clickablelabel.h"
+#include "clickablelabel.hpp"
 #include <QMessageBox>
 #include <string>
 
@@ -16,7 +16,6 @@ piece::piece(std::shared_ptr<MainWindow> parent, Qt::WindowFlags f,QPixmap px,QR
 piece::~piece() {}
 
 void piece::mousePressEvent(QMouseEvent* event) {
-    std::cout << this->x() << "\t" << this->y()  << "\tpressed" << std::endl;
     pressed=!pressed;
     emit clicked( this->loc_x, this->loc_y);
 }

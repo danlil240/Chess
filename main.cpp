@@ -1,6 +1,6 @@
 //#include "team.h"
 #include <QApplication>
-#include "chess_gui.h"
+#include "chess_gui.hpp"
 
 
 struct data_pass{
