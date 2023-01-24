@@ -58,19 +58,19 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
     int new_x = new_places[0][0];
     int new_y = new_places[0][1];
     std::shared_ptr<square> new_square = squares[new_places[0][0]][new_places[0][1]];
-    std::shared_ptr<square> old_square = squares[new_places[0][0]][new_places[0][1]];
-
     if (new_square->has_piece()) {
-        if (new_square->piece->color != old_square->piece->color) { // attack
+        if (new_square->piece->color != first_square->piece->color) { // attack
             std::shared_ptr<chess_piece> victim =
                     new_square->piece; // get the attacked piece
             for (auto i = std::begin(victim->threats); i < std::end(victim->threats);
                  i++) {
-                auto vec = squares[(*i)[0]][(*i)[1]]->threat_pieces;
-                vec.erase(std::remove(vec.begin(), vec.end(), victim),
-                          vec.end()); // remove the attacked piece from all squares it threatens
+                auto *vec = &squares[(*i)[0]][(*i)[1]]->threat_pieces;
+                vec->erase(std::remove(vec->begin(), vec->end(), victim),
+                          vec->end()); // remove the attacked piece from all squares it threatens
             }
             new_square->piece->threats.clear();
+            new_square->piece->alive_=false;
+            new_square->piece->location_={-1,-1};
         }
     }
     new_square->piece =
@@ -87,6 +87,7 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
         updateThreatensSquares(
                     (*piece)->location_[0],
                 (*piece)->location_[1]); // update the squares that the pieces threaten
+
     }
     updateThreatensSquares(
                 new_x, new_y); // update the squares that the moved piece threatens
@@ -321,9 +322,9 @@ void board::updateThreatensSquares(int x, int y) {
          threaten_square != std::end(piece->threats); ++threaten_square) {
         auto i = (*threaten_square)[0];
         auto j = (*threaten_square)[1];
-        auto vec=squares[i][j]->threat_pieces;
-        vec.erase(std::remove(vec.begin(), vec.end(), piece),
-                  vec.end());
+        auto *vec=&(squares[i][j]->threat_pieces);
+        vec->erase(std::remove(vec->begin(), vec->end(), piece),
+                  vec->end());
     }
     piece->threats.clear();
     switch (piece->piece_type) {
