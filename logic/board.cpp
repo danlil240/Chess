@@ -53,11 +53,13 @@ void board::initTeam(std::array<std::shared_ptr<chess_piece>, 16>(*team),
 void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                           std::vector<std::array<int, 2>> &new_places) {
     moves_cnt++;
-    std::cout << "*************  Move number: " << moves_cnt << "  ************* " << std::endl;
+    std::cout << "*************  Move number: " << moves_cnt << "  ************* "
+              << std::endl;
 
     int new_x = new_places[0][0];
     int new_y = new_places[0][1];
-    std::shared_ptr<square> new_square = squares[new_places[0][0]][new_places[0][1]];
+    std::shared_ptr<square> new_square =
+            squares[new_places[0][0]][new_places[0][1]];
     if (new_square->has_piece()) {
         if (new_square->piece->color != first_square->piece->color) { // attack
             std::shared_ptr<chess_piece> victim =
@@ -66,93 +68,63 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                  i++) {
                 auto *vec = &squares[(*i)[0]][(*i)[1]]->threat_pieces;
                 vec->erase(std::remove(vec->begin(), vec->end(), victim),
-                          vec->end()); // remove the attacked piece from all squares it threatens
+                           vec->end()); // remove the attacked piece from all squares it
+                // threatens
             }
             new_square->piece->threats.clear();
-            new_square->piece->alive_=false;
-            new_square->piece->location_={-1,-1};
+            new_square->piece->alive_ = false;
+            new_square->piece->location_ = {-1, -1};
         }
     }
     new_square->piece =
             first_square->piece; // move the chosen piece to the new position
-    new_square->piece->location_ = {
-        new_x, new_y}; // update the location of the piece
-    new_square->piece->moved =
-            true; // set moved attribute of the piece to true
+    new_square->piece->location_ = {new_x,
+                                    new_y}; // update the location of the piece
+    new_square->piece->moved = true; // set moved attribute of the piece to true
 
-    check_castling(old_places,new_places);
+    check_castling(old_places, new_places);
     auto threats = first_square->threat_pieces;
     first_square->piece = nullptr; // set the old position of the piece to null
     for (auto piece = std::begin(threats); piece != std::end(threats); ++piece) {
         updateThreatensSquares(
                     (*piece)->location_[0],
                 (*piece)->location_[1]); // update the squares that the pieces threaten
-
     }
     updateThreatensSquares(
                 new_x, new_y); // update the squares that the moved piece threatens
 }
 
 void board::check_castling(std::vector<std::array<int, 2>> &old_places,
-                           std::vector<std::array<int, 2>> &new_places){
+                           std::vector<std::array<int, 2>> &new_places) {
     int new_x = new_places[0][0]; // get x coordinate of new position
     int new_y = new_places[0][1]; // get y coordinate of new position
-    if (first_square->piece->piece_type == king &&
-            !king_moved_) { // check if the piece is a king and it has not moved yet
-        king_moved_ = true;
-        if (new_x - first_square->x == 2) { // check if king side castle move
-            squares[first_square->x + 1][new_y]->piece =
-                    squares[first_square->x + 3][new_y]
-                    ->piece; // move the rook to the new position
-            squares[first_square->x + 3][new_y]->piece->location_ = {
-                first_square->x + 1, new_y}; // update the location of the rook
-            squares[first_square->x + 3][new_y]->piece =
-                    nullptr; // set the old position of the rook to null
-            old_places.push_back(std::array<int, 2>(
-                                     {first_square->x + 3,
-                                      new_y})); // add old position of the rook to old_places vector
-            new_places.push_back(std::array<int, 2>(
-                                     {first_square->x + 1,
-                                      new_y})); // add new position of the rook to new_places vector
 
-            auto threats = squares[first_square->x + 3][new_y]->threat_pieces;
-            for (auto piece = std::begin(threats); piece != std::end(threats);
-                 ++piece) {
-                updateThreatensSquares(
-                            (*piece)->location_[0],
-                        (*piece)
-                        ->location_[1]); // update the squares that the pieces threaten
-            }
+    // check if the piece is a king and it has not moved yet
+    if (first_square->piece->piece_type == king && !king_moved_) {
+        king_moved_ = true;
+        int rook_x, new_rook_x;
+        if (new_x - first_square->x == 2) { // king side castle move
+            rook_x = first_square->x + 3;
+            new_rook_x = first_square->x + 1;
+        } else if (new_x - first_square->x == -2) { // queen side castle move
+            rook_x = first_square->x - 4;
+            new_rook_x = first_square->x - 1;
+        } else
+            return; // not a castle move
+        squares[new_rook_x][new_y]->piece = squares[rook_x][new_y]->piece;
+        squares[new_rook_x][new_y]->piece->location_ = {new_rook_x, new_y};
+        auto threats = squares[new_rook_x][new_y]->threat_pieces;
+        squares[rook_x][new_y]->piece = nullptr;
+        for (auto piece = std::begin(threats); piece != std::end(threats);
+             ++piece) {
             updateThreatensSquares(
-                        first_square->x + 1,
-                        new_y); // update the squares that the king and the rook threaten
-        } else if (new_x - first_square->x ==
-                   -2) { // check if queen side castle move
-            squares[first_square->x - 1][new_y]->piece =
-                    squares[first_square->x - 4][new_y]
-                    ->piece; // move the rook to the new position
-            squares[first_square->x - 4][new_y]->piece->location_ = {
-                first_square->x - 1, new_y}; // update the location of the rook
-            squares[first_square->x - 4][new_y]->piece =
-                    nullptr; // set the old position of the rook to null
-            old_places.push_back(std::array<int, 2>(
-                                     {first_square->x - 4,
-                                      new_y})); // add old position of the rook to old_places vector
-            new_places.push_back(std::array<int, 2>(
-                                     {first_square->x - 1,
-                                      new_y})); // add new position of the rook to new_places vector
-            auto threats = squares[first_square->x - 4][new_y]->threat_pieces;
-            for (auto piece = std::begin(threats); piece != std::end(threats);
-                 ++piece) {
-                updateThreatensSquares(
-                            (*piece)->location_[0],
-                        (*piece)
-                        ->location_[1]); // update the squares that the pieces threaten
-            }
-            updateThreatensSquares(
-                        first_square->x + 1,
-                        new_y); // update the squares that the king and the rook threaten
+                        (*piece)->location_[0],
+                    (*piece)
+                    ->location_[1]); // update the squares that the pieces threaten
         }
+        old_places.push_back({rook_x, new_y});
+        new_places.push_back({new_rook_x, new_y});
+        updateThreatensSquares(new_rook_x, new_y);
     }
 }
 
@@ -322,9 +294,8 @@ void board::updateThreatensSquares(int x, int y) {
          threaten_square != std::end(piece->threats); ++threaten_square) {
         auto i = (*threaten_square)[0];
         auto j = (*threaten_square)[1];
-        auto *vec=&(squares[i][j]->threat_pieces);
-        vec->erase(std::remove(vec->begin(), vec->end(), piece),
-                  vec->end());
+        auto *vec = &(squares[i][j]->threat_pieces);
+        vec->erase(std::remove(vec->begin(), vec->end(), piece), vec->end());
     }
     piece->threats.clear();
     switch (piece->piece_type) {
