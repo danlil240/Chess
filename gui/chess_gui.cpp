@@ -3,9 +3,11 @@
 
 chess_gui::chess_gui(std::shared_ptr<MainWindow> w) : w_{w} {
     initBoard();
-    initTeam(1, 0);
-    initTeam(0, 1);
     chess_ = std::make_shared<board>();
+
+    black_up_=chess_->black_up;
+    initTeam(1, !black_up_);
+    initTeam(0, black_up_);
 }
 
 void chess_gui::initBoard() {
@@ -32,8 +34,10 @@ void chess_gui::initBoard() {
 }
 
 void chess_gui::initTeam(int color, int up_down) {
-    int j = up_down ? 6 : 1;
-    int k = up_down ? 7 : 0;
+    int j = up_down ? 1 : 6;
+    int k = up_down ? 0 : 7;
+    int king_pos=black_up_ ?  3 : 4;
+    int queen_pos=black_up_ ?  4 : 3;
     for (int i = 0; i < 8; i++) {
         makePiece(color, i, "pawn", squares_[i][j], i, j);
     }
@@ -43,8 +47,8 @@ void chess_gui::initTeam(int color, int up_down) {
     makePiece(color, 11, "knight", squares_[6][k], 6, k);
     makePiece(color, 12, "bishop", squares_[2][k], 2, k);
     makePiece(color, 13, "bishop", squares_[5][k], 5, k);
-    makePiece(color, 14, "queen", squares_[3][k], 3, k);
-    makePiece(color, 15, "king", squares_[4][k], 4, k);
+    makePiece(color, 14, "queen", squares_[queen_pos][k], queen_pos, k);
+    makePiece(color, 15, "king", squares_[king_pos][k], king_pos, k);
 }
 
 void chess_gui::makePiece(int color, int idx, std::string pic_name,
@@ -70,11 +74,13 @@ void chess_gui::move(int x, int y, int new_x, int new_y) {
     squares_[x][y]->piece_->loc_y = new_y;
     squares_[new_x][new_y]->piece_ = squares_[x][y]->piece_;
     squares_[x][y]->piece_ = nullptr;
+    turn = turn == white ? black : white;
 }
 
 void chess_gui::buttonClicked(int x_, int y_) {
     if (squares_[x_][y_]->piece_ != nullptr and squre_pressed_ == nullptr) {
         /// First press
+        if (squares_[x_][y_]->piece_->color==turn){
         squares_[x_][y_]->piece_->setFrameStyle(QFrame::Panel | QFrame::Sunken);
         squares_[x_][y_]->piece_->setLineWidth(4);
         squre_pressed_ = squares_[x_][y_];
@@ -86,6 +92,7 @@ void chess_gui::buttonClicked(int x_, int y_) {
             squares_[(*iter)[0]][(*iter)[1]]->setFrameStyle(QFrame::Box |
                                                             QFrame::Sunken);
             squares_[(*iter)[0]][(*iter)[1]]->setLineWidth(2);
+        }
         }
     } else if (squares_[x_][y_]->piece_ != nullptr and
                squre_pressed_ != nullptr) {
@@ -125,6 +132,7 @@ void chess_gui::buttonClicked(int x_, int y_) {
                      old_p != std::end(old_places); ++old_p, ++new_p) {
                     move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
                 }
+
                 squre_pressed_ = nullptr;
                 clearSuggestions();
             }
@@ -145,6 +153,8 @@ void chess_gui::buttonClicked(int x_, int y_) {
                  old_p != std::end(old_places); ++old_p, ++new_p) {
                 move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
             }
+            if (old_places.size()>1)  turn = turn == white ? black : white;
+
             squre_pressed_ = nullptr;
             clearSuggestions();
         }

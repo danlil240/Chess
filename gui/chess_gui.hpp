@@ -30,7 +30,8 @@ private:
   std::vector< std::array<int, 2>> available_moves=std::vector< std::array<int, 2>>();
   std::vector< std::array<int, 2>> old_places=std::vector< std::array<int, 2>>();
   std::vector< std::array<int, 2>> new_places=std::vector< std::array<int, 2>>();
-
+  team_color turn = white;
+  bool black_up_;
 bool checkAvailable(int x, int y);
 };
 
