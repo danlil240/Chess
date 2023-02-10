@@ -4,7 +4,7 @@
 #define CHESS_GUI_H
 
 #include "board.hpp"
-#include "ClickableLabel.hpp"
+#include "clickablelabel.hpp"
 
 class chess_gui : public QWidget {
   Q_OBJECT

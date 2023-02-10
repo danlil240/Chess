@@ -1,5 +1,5 @@
-#ifndef CLICKABLELABEL_H
-#define CLICKABLELABEL_H
+#ifndef clickablelabel_H
+#define clickablelabel_H
 
 #include "mainwindow.hpp"
 #include <QLabel>
@@ -39,4 +39,4 @@ public:
 private:
 };
 
-#endif // CLICKABLELABEL_H
+#endif // clickablelabel_H
