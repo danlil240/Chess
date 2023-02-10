@@ -4,7 +4,8 @@
 #include "mainwindow.hpp"
 #include <QLabel>
 #include <QWidget>
-
+#include <QMessageBox>
+#include <QPushButton>
 #include <Qt>
 #include <iostream>
 #include <QThread>
@@ -15,11 +16,12 @@ class piece : public QLabel {
 
 public:
   explicit piece(std::shared_ptr<MainWindow> parent = Q_NULLPTR,
-                          Qt::WindowFlags f = Qt::WindowFlags(),QPixmap px=QPixmap(""),QRect geo=QRect(0,0,0,0),int x_=0,int y_=0,int color_=0);
+                          Qt::WindowFlags f = Qt::WindowFlags(),QPixmap px=QPixmap(""),QRect geo=QRect(0,0,0,0),int x_=0,int y_=0,int color_=0,std::string name="");
   ~piece();
   bool pressed=false;
     int loc_x,loc_y;
     int color;
+    std::string name_;
 signals:
   void clicked(int X,int Y);
 

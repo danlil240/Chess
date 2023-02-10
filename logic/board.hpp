@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <QMessageBox>
+
 
 enum piece_type_description {
     king = 1,
@@ -49,50 +51,52 @@ public:
     ~board();
     void updateSquares(std::vector<std::array<int, 2>> &old_places,
                        std::vector<std::array<int, 2>> &new_places,
-                       bool formal = true);
+                       bool formal = true,piece_type_description new_type = king);
+    void updatePawn(std::array<int, 2> &location ,piece_type_description new_type = king);
+
     bool checkAvailableMoves(int x, int y,
                              std::vector<std::array<int, 2>> &available_moves);
     int black_up;
 
 private:
-//    struct state {
-//        std::shared_ptr<square> squares[8][8];
-//        std::array<std::shared_ptr<chess_piece>, 32> pieces_;
+/*    struct state {
+        std::shared_ptr<square> squares[8][8];
+        std::array<std::shared_ptr<chess_piece>, 32> pieces_;
 
-//        state &operator=(const state &new_state) {
-//            for (int i = 0; i < 32; i++) {
-//                pieces_[i] = std::make_shared<chess_piece>(*new_state.pieces_[i]);
-//            }
-//            for (int i = 0; i < 8; i++) {
-//                for (int j = 0; j < 8; j++) {
-//                    squares[i][j] = std::make_shared<square>(*new_state.squares[i][j]);
-//                    if (squares[i][j]->piece){
-//                    std::shared_ptr<chess_piece> old_piece= new_state.squares[i][j]->piece;
-//                    std::shared_ptr<chess_piece> *s_piece =
-//                            find_if(pieces_.begin(), pieces_.end(),
-//                                    [old_piece](const std::shared_ptr<chess_piece> obj) {
-//                        return obj->location_ == old_piece->location_;
-//                    });
-//                    squares[i][j]->piece=*s_piece;
-//                    }
-//                    squares[i][j]->threat_pieces.clear();
-//                    for (std::shared_ptr<chess_piece> &t_piece :
-//                         new_state.squares[i][j]->threat_pieces) {
-//                        std::shared_ptr<chess_piece> *it =
-//                                find_if(pieces_.begin(), pieces_.end(),
-//                                        [t_piece](const std::shared_ptr<chess_piece> obj) {
-//                            return obj->location_ == t_piece->location_;
-//                        });
-//                        squares[i][j]->threat_pieces.push_back(*it);
-//                    }
-//                }
-//            }
+        state &operator=(const state &new_state) {
+            for (int i = 0; i < 32; i++) {
+                pieces_[i] = std::make_shared<chess_piece>(*new_state.pieces_[i]);
+            }
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    squares[i][j] = std::make_shared<square>(*new_state.squares[i][j]);
+                    if (squares[i][j]->piece){
+                    std::shared_ptr<chess_piece> old_piece= new_state.squares[i][j]->piece;
+                    std::shared_ptr<chess_piece> *s_piece =
+                            find_if(pieces_.begin(), pieces_.end(),
+                                    [old_piece](const std::shared_ptr<chess_piece> obj) {
+                        return obj->location_ == old_piece->location_;
+                    });
+                    squares[i][j]->piece=*s_piece;
+                    }
+                    squares[i][j]->threat_pieces.clear();
+                    for (std::shared_ptr<chess_piece> &t_piece :
+                         new_state.squares[i][j]->threat_pieces) {
+                        std::shared_ptr<chess_piece> *it =
+                                find_if(pieces_.begin(), pieces_.end(),
+                                        [t_piece](const std::shared_ptr<chess_piece> obj) {
+                            return obj->location_ == t_piece->location_;
+                        });
+                        squares[i][j]->threat_pieces.push_back(*it);
+                    }
+                }
+            }
 
-//            return *this;
-//        }
-//    };
-//    state state_;
-//    state last_state_;
+            return *this;
+        }
+    };
+    state state_;
+    state last_state_;*/
 
     board_state state_;
     board_state last_state_;

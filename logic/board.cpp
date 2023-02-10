@@ -96,7 +96,7 @@ void board::updatePieces(std::array<std::array<int, 2>, 32> new_state) {
 
 void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                           std::vector<std::array<int, 2>> &new_places,
-                          bool formal) {
+                          bool formal,piece_type_description new_type) {
   int old_x = old_places[0][0];
   int old_y = old_places[0][1];
   int new_x = new_places[0][0];
@@ -162,6 +162,13 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
     }
     turn = turn == white ? black : white;
   }
+}
+
+void board::updatePawn(std::array<int, 2> &location ,piece_type_description new_type) {
+    auto main_piece = squares_[location[0]][location[1]]->piece;
+    if(main_piece->piece_type==pawn && (location[1]==0 | location[1]==7)){
+        main_piece->piece_type=new_type;
+    }
 }
 
 void board::checkCastling(std::vector<std::array<int, 2>> &old_places,

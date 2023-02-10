@@ -5,7 +5,7 @@ chess_gui::chess_gui(std::shared_ptr<MainWindow> w) : w_{w} {
     initBoard();
     chess_ = std::make_shared<board>();
 
-    black_up_=chess_->black_up;
+    black_up_ = chess_->black_up;
     initTeam(1, !black_up_);
     initTeam(0, black_up_);
 }
@@ -36,8 +36,8 @@ void chess_gui::initBoard() {
 void chess_gui::initTeam(int color, int up_down) {
     int j = up_down ? 1 : 6;
     int k = up_down ? 0 : 7;
-    int king_pos=black_up_ ?  3 : 4;
-    int queen_pos=black_up_ ?  4 : 3;
+    int king_pos = black_up_ ? 3 : 4;
+    int queen_pos = black_up_ ? 4 : 3;
     for (int i = 0; i < 8; i++) {
         makePiece(color, i, "pawn", squares_[i][j], i, j);
     }
@@ -60,7 +60,7 @@ void chess_gui::makePiece(int color, int idx, std::string pic_name,
     (*team)[idx] = std::make_shared<piece>(
                 w_, Qt::WindowFlags(),
                 QPixmap(dir.append(clr + pic_name + ".png").c_str()), square->geometry(),
-                x, y, color);
+                x, y, color, pic_name);
     square->piece_ = (*team)[idx];
     connect((*team)[idx].get(), &piece::clicked, this, &chess_gui::buttonClicked);
 }
@@ -80,19 +80,19 @@ void chess_gui::move(int x, int y, int new_x, int new_y) {
 void chess_gui::buttonClicked(int x_, int y_) {
     if (squares_[x_][y_]->piece_ != nullptr and squre_pressed_ == nullptr) {
         /// First press
-        if (squares_[x_][y_]->piece_->color==turn){
-        squares_[x_][y_]->piece_->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-        squares_[x_][y_]->piece_->setLineWidth(4);
-        squre_pressed_ = squares_[x_][y_];
-        clearSuggestions();
-        available_moves.clear();
-        chess_->checkAvailableMoves(x_, y_, available_moves);
-        for (auto iter = available_moves.cbegin(); iter != available_moves.cend();
-             iter++) {
-            squares_[(*iter)[0]][(*iter)[1]]->setFrameStyle(QFrame::Box |
-                                                            QFrame::Sunken);
-            squares_[(*iter)[0]][(*iter)[1]]->setLineWidth(2);
-        }
+        if (squares_[x_][y_]->piece_->color == turn) {
+            squares_[x_][y_]->piece_->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+            squares_[x_][y_]->piece_->setLineWidth(4);
+            squre_pressed_ = squares_[x_][y_];
+            clearSuggestions();
+            available_moves.clear();
+            chess_->checkAvailableMoves(x_, y_, available_moves);
+            for (auto iter = available_moves.cbegin(); iter != available_moves.cend();
+                 iter++) {
+                squares_[(*iter)[0]][(*iter)[1]]->setFrameStyle(QFrame::Box |
+                                                                QFrame::Sunken);
+                squares_[(*iter)[0]][(*iter)[1]]->setLineWidth(2);
+            }
         }
     } else if (squares_[x_][y_]->piece_ != nullptr and
                squre_pressed_ != nullptr) {
@@ -117,22 +117,23 @@ void chess_gui::buttonClicked(int x_, int y_) {
                                                                 QFrame::Sunken);
                 squares_[(*iter)[0]][(*iter)[1]]->setLineWidth(2);
             }
+
         } else {
             /// Sec press on enemy
             if (checkAvailable(x_, y_)) {
                 squre_pressed_->piece_->setLineWidth(0);
                 old_places.clear();
-                old_places.push_back(
-                            std::array<int, 2>({squre_pressed_->loc_x, squre_pressed_->loc_y}));
+                old_places.push_back({squre_pressed_->loc_x, squre_pressed_->loc_y});
                 new_places.clear();
-                new_places.push_back(std::array<int, 2>({x_, y_}));
+                new_places.push_back({x_, y_});
+
                 chess_->updateSquares(old_places, new_places);
                 for (auto old_p = std::begin(old_places),
                      new_p = std::begin(new_places);
                      old_p != std::end(old_places); ++old_p, ++new_p) {
                     move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
                 }
-
+                checkPawnAtEnd(x_, y_);
                 squre_pressed_ = nullptr;
                 clearSuggestions();
             }
@@ -144,22 +145,72 @@ void chess_gui::buttonClicked(int x_, int y_) {
         if (checkAvailable(x_, y_)) {
             squre_pressed_->piece_->setLineWidth(0);
             old_places.clear();
-            old_places.push_back(
-                        std::array<int, 2>({squre_pressed_->loc_x, squre_pressed_->loc_y}));
+            old_places.push_back({squre_pressed_->loc_x, squre_pressed_->loc_y});
             new_places.clear();
-            new_places.push_back(std::array<int, 2>({x_, y_}));
+            new_places.push_back({x_, y_});
+
             chess_->updateSquares(old_places, new_places);
             for (auto old_p = std::begin(old_places), new_p = std::begin(new_places);
                  old_p != std::end(old_places); ++old_p, ++new_p) {
                 move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
             }
-            if (old_places.size()>1)  turn = turn == white ? black : white;
-
+            if (old_places.size() > 1)
+                turn = turn == white ? black : white;
+            checkPawnAtEnd(x_, y_);
             squre_pressed_ = nullptr;
             clearSuggestions();
         }
 
     } else {
+    }
+}
+
+void chess_gui::checkPawnAtEnd(int x_, int y_) {
+    if (squares_[x_][y_]->piece_->name_ == "pawn") {
+        if (y_ == 0 || y_ == 7) {
+            piece_type_description piece_type;
+            QMessageBox msgBox;
+            msgBox.setText("Choose a chess piece:");
+            QPushButton *queenButton =
+                    msgBox.addButton("Queen", QMessageBox::ActionRole);
+            QPushButton *rookButton =
+                    msgBox.addButton("Rook", QMessageBox::ActionRole);
+            QPushButton *bishopButton =
+                    msgBox.addButton("Bishop", QMessageBox::ActionRole);
+            QPushButton *knightButton =
+                    msgBox.addButton("Knight", QMessageBox::ActionRole);
+
+            msgBox.exec();
+            int color= squares_[x_][y_]->piece_->color;
+            QString d=":/Resources/pics/JohnPablok Cburnett Chess set/PNGs/With "
+                      "Shadow/1024px/";
+            QString clr = color ? "w_" : "b_";
+            QString pic_name;
+            if (msgBox.clickedButton() == queenButton) {
+                piece_type = queen;
+                  pic_name="queen";
+                squares_[x_][y_]->piece_->name_="queen";
+            } else if (msgBox.clickedButton() == rookButton) {
+                piece_type = rook;
+                pic_name="rook";
+                squares_[x_][y_]->piece_->name_="rook";
+            } else if (msgBox.clickedButton() == bishopButton) {
+                piece_type = bishop;
+                pic_name="bishop";
+                squares_[x_][y_]->piece_->name_="bishop";
+            } else if (msgBox.clickedButton() == knightButton) {
+                piece_type = knight;
+                pic_name="knight";
+                squares_[x_][y_]->piece_->name_="knight";
+            }
+            d.append(clr + pic_name + ".png");
+            std::array<int, 2> a = {x_, y_};
+
+            chess_->updatePawn(a, piece_type);
+            std::cout << d.toStdString() << std::endl;
+            squares_[x_][y_]->piece_->setPixmap(QPixmap(d));
+            squares_[x_][y_]->piece_->show();
+        }
     }
 }
 
@@ -172,11 +223,8 @@ void chess_gui::clearSuggestions() {
 }
 
 bool chess_gui::checkAvailable(int x, int y) {
-    for (auto iter = available_moves.cbegin(); iter != available_moves.cend();
-         iter++) {
-        if ((*iter)[0] == x and (*iter)[1] == y) {
-            return true;
-        }
-    }
-    return false;
+    std::array<int, 2> new_place = {x, y};
+    auto it =
+            std::find(available_moves.begin(), available_moves.end(), new_place);
+    return it != available_moves.end();
 }

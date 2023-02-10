@@ -1,16 +1,16 @@
 #include "clickablelabel.hpp"
-#include <QMessageBox>
 #include <string>
 
 
-piece::piece(std::shared_ptr<MainWindow> parent, Qt::WindowFlags f,QPixmap px,QRect geo,int x_,int y_,int color_)
+piece::piece(std::shared_ptr<MainWindow> parent, Qt::WindowFlags f,QPixmap px,QRect geo,int x_,int y_,int color_,std::string name)
     : QLabel(parent.get()) {
     this->setPixmap(px);
     this->setScaledContents(true);
     this->setGeometry(geo);
-    this->loc_x=x_;
-    this->loc_y=y_;
-    this->color=color_;
+    loc_x=x_;
+    loc_y=y_;
+    color=color_;
+    name_=name;
 }
 
 piece::~piece() {}
