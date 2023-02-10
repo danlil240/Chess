@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+215272f2a21da033aedcebe50ce97549 CMakeFiles/QtChess_autogen
+f07171ce8f83e8f162d37e7af2382306 QtChess_autogen/DMHXEJ42XS/qrc_pics.cpp

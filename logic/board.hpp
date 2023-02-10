@@ -36,7 +36,6 @@ struct chess_piece {
 
 struct square {
     std::shared_ptr<chess_piece> piece;
-    bool isThreaten = false;
     square(int x, int y) : x(x), y(y) { piece = nullptr; }
     int x, y;
     std::vector<std::shared_ptr<chess_piece>> threat_pieces;

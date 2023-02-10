@@ -80,32 +80,30 @@ void board::updatePieces(std::array<std::array<int, 2>, 32> new_state) {
         piece->threats.clear();
         piece->location_ = new_state[i];
         piece->alive_ = piece->location_[0] >= 0;
-        squares_[new_state[i][0]][new_state[i][1]]->piece = piece;
-        updateThreatensSquares(piece->location_[0], piece->location_[1]);
+        if (piece->alive_) {
+            squares_[new_state[i][0]][new_state[i][1]]->piece = piece;
+        }
+
         i++;
+    }
+    for (auto &piece : pieces_) {
+        updateThreatensSquares(piece->location_[0], piece->location_[1]);
     }
 }
 
 void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                           std::vector<std::array<int, 2>> &new_places,
                           bool formal) {
-    if (formal) {
-        moves_cnt++;
-        std::string clr = turn == white ? "White" : "Black";
-        std::cout << "*************   " << clr
-                  << " turn.  Move number: " << moves_cnt << "  ************* "
-                  << std::endl;
-    }
     int old_x = old_places[0][0];
     int old_y = old_places[0][1];
     int new_x = new_places[0][0];
     int new_y = new_places[0][1];
     std::shared_ptr<square> new_square = squares_[new_x][new_y];
     std::shared_ptr<square> old_square = squares_[old_x][old_y];
+    auto main_piece = old_square->piece;
     if (new_square->has_piece()) {
-        if (new_square->piece->color != old_square->piece->color) { // attack
-            std::shared_ptr<chess_piece> victim =
-                    new_square->piece; // get the attacked piece
+        auto victim = new_square->piece;          // get the attacked piece
+        if (victim->color != main_piece->color) { // attack
             for (auto i = std::begin(victim->threats); i < std::end(victim->threats);
                  i++) {
                 auto *vec = &squares_[(*i)[0]][(*i)[1]]->threat_pieces;
@@ -116,10 +114,15 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
             victim->threats.clear();
             victim->alive_ = false;
             victim->location_ = {-1, -1};
+            if (formal) {
+                auto x = std::find(state_.begin(), state_.end(), old_places[0]);
+                if (x != state_.end()) {
+                    state_[x - state_.begin()] = {-1, -1};
+                }
+            }
         }
     }
-    new_square->piece =
-            old_square->piece; // move the chosen piece to the new position
+    new_square->piece = main_piece; // move the chosen piece to the new position
     new_square->piece->location_ = {new_x,
                                     new_y}; // update the location of the piece
 
@@ -141,13 +144,18 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                 (*piece)->location_[1]); // update the squares that the pieces threaten
     }
     if (formal) {
-        turn = turn == white ? black : white;
+        moves_cnt++;
+        std::string clr = turn == white ? "White" : "Black";
+        std::cout << "*************   " << clr
+                  << " turn.  Move number: " << moves_cnt << "  ************* "
+                  << std::endl;
         for (int i = 0; i < old_places.size(); i++) {
             auto x = std::find(state_.begin(), state_.end(), old_places[i]);
             if (x != state_.end()) {
                 state_[x - state_.begin()] = new_places[i];
             }
         }
+        turn = turn == white ? black : white;
     }
 }
 
@@ -342,24 +350,24 @@ bool board::checkAvailableMoves(
         default:
             break;
         }
-        if (king_threaten) {
-            std::vector<std::array<int, 2>> available_moves_temp;
-            for (auto move : available_moves) {
-                std::vector<std::array<int, 2>> old_p;
-                std::vector<std::array<int, 2>> new_p;
-                old_p = {{x, y}};
-                new_p = {move};
-                updateSquares(old_p, new_p, false);
-                king_threaten = !notThreaten(squares_[pieces_[king_idx]->location_[0]]
-                        [pieces_[king_idx]->location_[1]],
-                        color);
-                if (!king_threaten) {
-                    available_moves_temp.push_back(move);
-                }
-                updatePieces(state_);
+        //        if (king_threaten) {
+        std::vector<std::array<int, 2>> available_moves_temp;
+        for (auto move : available_moves) {
+            std::vector<std::array<int, 2>> old_p;
+            std::vector<std::array<int, 2>> new_p;
+            old_p = {{x, y}};
+            new_p = {move};
+            updateSquares(old_p, new_p, false);
+            king_threaten = !notThreaten(squares_[pieces_[king_idx]->location_[0]]
+                    [pieces_[king_idx]->location_[1]],
+                    color);
+            if (!king_threaten) {
+                available_moves_temp.push_back(move);
             }
-            available_moves = available_moves_temp;
+            updatePieces(state_);
         }
+        available_moves = available_moves_temp;
+        //        }
     } else {
         std::cout << "not a piece" << std::endl;
     }
@@ -386,8 +394,8 @@ void board::updateThreatensSquares(int x, int y) {
     int dir = squares_[x][y]->piece->dir;
     std::shared_ptr<chess_piece> piece = squares_[x][y]->piece;
 
-    //    team_color clr = piece->color;
-    //    std::cout << "Threatens squares by square: " << x << ", " << y <<
+        team_color clr = piece->color;
+        std::cout << "Threatens squares by square: " << x << ", " << y <<  " by: ";
     //    std::endl;
 
     for (auto threaten_square = std::begin(piece->threats);
@@ -401,7 +409,7 @@ void board::updateThreatensSquares(int x, int y) {
     switch (piece->piece_type) {
 
     case pawn:
-        //        std::cout << "pawn" << std::endl;
+                std::cout << "pawn" << std::endl;
         if (x < 7) {
             squares_[x + 1][y + dir]->threat_pieces.push_back(piece);
             piece->threats.push_back({x + 1, y + dir});
@@ -414,7 +422,7 @@ void board::updateThreatensSquares(int x, int y) {
         break;
 
     case rook:
-        //        std::cout << "rook" << std::endl;
+                std::cout << "rook" << std::endl;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if ((i == 0 && j == 0) || (i != 0 && j != 0))
@@ -425,7 +433,7 @@ void board::updateThreatensSquares(int x, int y) {
         break;
 
     case bishop:
-        //        std::cout << "bishop" << std::endl;
+                std::cout << "bishop" << std::endl;
         for (int i = -1; i <= 1; i += 2) {
             for (int j = -1; j <= 1; j += 2) {
                 checkAndMark(x, y, i, j, piece);
@@ -434,7 +442,7 @@ void board::updateThreatensSquares(int x, int y) {
 
         break;
     case knight:
-        //        std::cout << "knight" << std::endl;
+                std::cout << "knight" << std::endl;
 
         knight_options_ = {{x + 2, y + 1}, {x - 2, y + 1}, {x + 2, y - 1},
                            {x - 2, y - 1}, {x + 1, y + 2}, {x - 1, y + 2},
@@ -449,7 +457,7 @@ void board::updateThreatensSquares(int x, int y) {
         break;
 
     case queen:
-        //        std::cout << "queen" << std::endl;
+                std::cout << "queen" << std::endl;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (i == 0 && j == 0)
@@ -459,7 +467,7 @@ void board::updateThreatensSquares(int x, int y) {
         }
         break;
     case king:
-        //        std::cout << "king" << std::endl;
+                std::cout << "king" << std::endl;
         king_options_ = {{x + 1, y}, {x + 1, y + 1}, {x, y + 1}, {x - 1, y + 1},
                          {x - 1, y}, {x - 1, y - 1}, {x, y - 1}, {x + 1, y - 1}};
         for (auto it = std::begin(king_options_); it != std::end(king_options_);
@@ -473,12 +481,12 @@ void board::updateThreatensSquares(int x, int y) {
     default:
         break;
     }
-    //    for (auto threaten_square = std::begin(piece->threats);
-    //         threaten_square != std::end(piece->threats); ++threaten_square) {
-    //        auto x = (*threaten_square)[0];
-    //        auto y = (*threaten_square)[1];
-    //        std::cout << "x: " << x << "\ty: " << y << std::endl;
-    //    }
+        for (auto threaten_square = std::begin(piece->threats);
+             threaten_square != std::end(piece->threats); ++threaten_square) {
+            auto x = (*threaten_square)[0];
+            auto y = (*threaten_square)[1];
+            std::cout << "x: " << x << "\ty: " << y << std::endl;
+        }
 }
 
 void board::checkDirection(int x, int y, int dx, int dy,

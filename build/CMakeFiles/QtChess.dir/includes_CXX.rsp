@@ -1,0 +1,1 @@
+-IC:/Users/Daniel/Documents/QtChess/build/QtChess_autogen/include -IC:/Users/Daniel/Documents/QtChess/logic -IC:/Users/Daniel/Documents/QtChess/gui -isystem C:/Qt/6.4.1/mingw_64/include/QtCore -isystem C:/Qt/6.4.1/mingw_64/include -isystem "C:/Qt/6.4.1/mingw_64/mkspecs/win32-g++" -isystem C:/Qt/6.4.1/mingw_64/include/QtWidgets -isystem C:/Qt/6.4.1/mingw_64/include/QtGui
