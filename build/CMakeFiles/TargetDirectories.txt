@@ -1,8 +1,0 @@
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/QtChess.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/edit_cache.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/rebuild_cache.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/list_install_components.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/install.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/install/local.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/install/strip.dir
-C:/Users/Daniel/Documents/QtChess/build/CMakeFiles/QtChess_autogen.dir

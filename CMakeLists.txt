@@ -16,16 +16,12 @@ include_directories(logic gui)
 
 set(PROJECT_SOURCES
         main.cpp
-        gui/mainwindow.cpp
-        gui/mainwindow.hpp
-        gui/mainwindow.ui
-        logic/board.hpp
-        logic/board.cpp
-        gui/pics.qrc
-        gui/clickablelabel.hpp
-        gui/clickablelabel.cpp
-        gui/chess_gui.cpp
-        gui/chess_gui.hpp
+        mainwindow.ui
+        board.hpp
+        board.cpp
+        pics.qrc
+        chess_gui.cpp
+        chess_gui.hpp
 )
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtChess
