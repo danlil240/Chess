@@ -1,16 +1,13 @@
 #include "chess_gui.hpp"
 
-
-chess_gui::chess_gui(QWidget *parent)    : QMainWindow(parent)
-  , ui(new Ui::MainWindow) {
-
+chess_gui::chess_gui(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
 
     ui->setupUi(this);
 
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
-
 
     newGame = new QAction(tr("N&ew Game"), this);
     newGame->setShortcuts(QKeySequence::New);
@@ -19,21 +16,29 @@ chess_gui::chess_gui(QWidget *parent)    : QMainWindow(parent)
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newGame);
     fileMenu->addAction(exitAct);
-    layout=std::make_shared<QGridLayout>();
+    layout = new QGridLayout;
 
-    initBoard();
-    chess_ = std::make_shared<board>();
-    black_up_ = chess_->black_up;
-    initTeam(1, !black_up_);
-    initTeam(0, black_up_);
-
+    newGameSlot();
 }
 
-void chess_gui::newGameSlot(){
+void chess_gui::newGameSlot() {
+    for (int i = 0; i < 16; i++) {
+        w_team_[i].reset();
+        b_team_[i].reset();
+    }
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            squares_[i][j].reset();
+        }
+    }
+    chess_.reset();
     initBoard();
     chess_ = std::make_shared<board>();
+
     initTeam(1, !black_up_);
     initTeam(0, black_up_);
+    turn=white;
+     squre_pressed_ = nullptr;
 }
 
 void chess_gui::initBoard() {
@@ -52,6 +57,7 @@ void chess_gui::initBoard() {
             squares_[i][j] = std::make_shared<gui_square>(
                         this, Qt::WindowFlags(), pixmap,
                         QRect(i * 100 + 100, j * 100 + 50, 100, 100), i, j);
+            squares_[i][j]->show();
             connect(squares_[i][j].get(), &gui_square::clicked, this,
                     &chess_gui::buttonClicked);
         }
@@ -87,6 +93,7 @@ void chess_gui::makePiece(int color, int idx, std::string pic_name,
                 QPixmap(dir.append(clr + pic_name + ".png").c_str()), square->geometry(),
                 x, y, color, pic_name);
     square->piece_ = (*team)[idx];
+    (*team)[idx]->show();
     connect((*team)[idx].get(), &piece::clicked, this, &chess_gui::buttonClicked);
 }
 
@@ -103,11 +110,11 @@ void chess_gui::move(int x, int y, int new_x, int new_y) {
 }
 
 void chess_gui::buttonClicked(int x_, int y_) {
-    if (squares_[x_][y_]->piece_ != nullptr and squre_pressed_ == nullptr) {
+    if (squares_[x_][y_]->piece_ and !squre_pressed_) {
         /// First press
         if (squares_[x_][y_]->piece_->color == turn) {
             squares_[x_][y_]->piece_->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-            squares_[x_][y_]->piece_->setLineWidth(4);
+            squares_[x_][y_]->piece_->setLineWidth(6);
             squre_pressed_ = squares_[x_][y_];
             clearSuggestions();
             available_moves.clear();
@@ -119,8 +126,7 @@ void chess_gui::buttonClicked(int x_, int y_) {
                 squares_[(*iter)[0]][(*iter)[1]]->setLineWidth(2);
             }
         }
-    } else if (squares_[x_][y_]->piece_ != nullptr and
-               squre_pressed_ != nullptr) {
+    } else if (squares_[x_][y_]->piece_ and squre_pressed_) {
         if (squares_[x_][y_]->piece_ == squre_pressed_->piece_) {
             /// cancel first press
             squre_pressed_->piece_->setLineWidth(0);
@@ -142,51 +148,31 @@ void chess_gui::buttonClicked(int x_, int y_) {
                                                                 QFrame::Sunken);
                 squares_[(*iter)[0]][(*iter)[1]]->setLineWidth(2);
             }
+        } else
+            secPress(x_, y_); /// Sec press on enemy
 
-        } else {
-            /// Sec press on enemy
-            if (checkAvailable(x_, y_)) {
-                squre_pressed_->piece_->setLineWidth(0);
-                old_places.clear();
-                old_places.push_back({squre_pressed_->loc_x, squre_pressed_->loc_y});
-                new_places.clear();
-                new_places.push_back({x_, y_});
+    } else if (squares_[x_][y_]->piece_ == nullptr and squre_pressed_ != nullptr)
+        secPress(x_, y_); /// Sec press on empty
+}
 
-                chess_->updateSquares(old_places, new_places);
-                for (auto old_p = std::begin(old_places),
-                     new_p = std::begin(new_places);
-                     old_p != std::end(old_places); ++old_p, ++new_p) {
-                    move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
-                }
-                checkPawnAtEnd(x_, y_);
-                squre_pressed_ = nullptr;
-                clearSuggestions();
-            }
+void chess_gui::secPress(int x_, int y_) {
+    if (checkAvailable(x_, y_)) {
+        squre_pressed_->piece_->setLineWidth(0);
+        old_places.clear();
+        old_places.push_back({squre_pressed_->loc_x, squre_pressed_->loc_y});
+        new_places.clear();
+        new_places.push_back({x_, y_});
+
+        chess_->updateSquares(old_places, new_places);
+        for (auto old_p = std::begin(old_places), new_p = std::begin(new_places);
+             old_p != std::end(old_places); ++old_p, ++new_p) {
+            move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
         }
-
-    } else if (squares_[x_][y_]->piece_ == nullptr and
-               squre_pressed_ != nullptr) {
-        /// Sec press on empty
-        if (checkAvailable(x_, y_)) {
-            squre_pressed_->piece_->setLineWidth(0);
-            old_places.clear();
-            old_places.push_back({squre_pressed_->loc_x, squre_pressed_->loc_y});
-            new_places.clear();
-            new_places.push_back({x_, y_});
-
-            chess_->updateSquares(old_places, new_places);
-            for (auto old_p = std::begin(old_places), new_p = std::begin(new_places);
-                 old_p != std::end(old_places); ++old_p, ++new_p) {
-                move((*old_p)[0], (*old_p)[1], (*new_p)[0], (*new_p)[1]);
-            }
-            if (old_places.size() > 1)
-                turn = turn == white ? black : white;
-            checkPawnAtEnd(x_, y_);
-            squre_pressed_ = nullptr;
-            clearSuggestions();
-        }
-
-    } else {
+        if (old_places.size() > 1)
+            turn = turn == white ? black : white;
+        checkPawnAtEnd(x_, y_);
+        squre_pressed_ = nullptr;
+        clearSuggestions();
     }
 }
 
@@ -206,27 +192,27 @@ void chess_gui::checkPawnAtEnd(int x_, int y_) {
                     msgBox.addButton("Knight", QMessageBox::ActionRole);
 
             msgBox.exec();
-            int color= squares_[x_][y_]->piece_->color;
-            QString d=":/Resources/pics/JohnPablok Cburnett Chess set/PNGs/With "
-                      "Shadow/1024px/";
+            int color = squares_[x_][y_]->piece_->color;
+            QString d = ":/Resources/pics/JohnPablok Cburnett Chess set/PNGs/With "
+                        "Shadow/1024px/";
             QString clr = color ? "w_" : "b_";
             QString pic_name;
             if (msgBox.clickedButton() == queenButton) {
                 piece_type = queen;
-                  pic_name="queen";
-                squares_[x_][y_]->piece_->name_="queen";
+                pic_name = "queen";
+                squares_[x_][y_]->piece_->name_ = "queen";
             } else if (msgBox.clickedButton() == rookButton) {
                 piece_type = rook;
-                pic_name="rook";
-                squares_[x_][y_]->piece_->name_="rook";
+                pic_name = "rook";
+                squares_[x_][y_]->piece_->name_ = "rook";
             } else if (msgBox.clickedButton() == bishopButton) {
                 piece_type = bishop;
-                pic_name="bishop";
-                squares_[x_][y_]->piece_->name_="bishop";
+                pic_name = "bishop";
+                squares_[x_][y_]->piece_->name_ = "bishop";
             } else if (msgBox.clickedButton() == knightButton) {
                 piece_type = knight;
-                pic_name="knight";
-                squares_[x_][y_]->piece_->name_="knight";
+                pic_name = "knight";
+                squares_[x_][y_]->piece_->name_ = "knight";
             }
             d.append(clr + pic_name + ".png");
             std::array<int, 2> a = {x_, y_};

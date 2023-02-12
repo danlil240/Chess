@@ -31,6 +31,7 @@ public:
         this->setPixmap(px);
         this->setScaledContents(true);
         this->setGeometry(geo);
+        this->setMaximumSize(QSize(120,120));
         loc_x = x_;
         loc_y = y_;
         color = color_;
@@ -78,7 +79,7 @@ private:
     void initBoard();
 
     std::shared_ptr<board> chess_;
-    std::shared_ptr<QGridLayout> layout;
+    QGridLayout *layout;
     void makePiece(int color, int idx, std::string pic_name,
                    std::shared_ptr<gui_square> pos, int x, int y);
     std::shared_ptr<gui_square> squares_[8][8];
@@ -87,7 +88,7 @@ private:
     std::shared_ptr<gui_square> squre_pressed_ = nullptr;
     void buttonClicked(int x_, int y_);
     void checkPawnAtEnd(int x_, int y_);
-
+void secPress(int x_, int y_);
     void clearSuggestions();
 
     std::vector<std::array<int, 2>> available_moves =

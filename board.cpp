@@ -132,7 +132,7 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                                     new_y}; // update the location of the piece
 
     checkCastling(old_places, new_places);
-    new_square->piece->moved = true; // set moved attribute of the piece to true
+
     auto threats = old_square->threat_pieces;
     old_square->piece = nullptr; // set the old position of the piece to null
     for (auto piece = std::begin(threats); piece != std::end(threats); ++piece) {
@@ -149,6 +149,7 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                 (*piece)->location_[1]); // update the squares that the pieces threaten
     }
     if (formal) {
+        new_square->piece->moved = true; // set moved attribute of the piece to true
         moves_cnt++;
         std::string clr = turn == white ? "White" : "Black";
         std::cout << "*************   " << clr
@@ -167,10 +168,17 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                 turn);
 
         if (king_threaten and checkForMate(turn)) {
+            game_state.state=checkmate;
+            game_state.team=turn == white ? black : white;
             std::cout << "******    Checkmate!!!   *******   " << std::endl;
         }
         else if(!king_threaten and checkForMate(turn)){
+            game_state.state=draw;
             std::cout << "******    Draw!!!   *******   " << std::endl;
+        }
+        else if(king_threaten){
+            game_state.state=check;
+            game_state.team=turn;
         }
     }
 }
