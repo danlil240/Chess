@@ -11,6 +11,8 @@
 #include <QPushButton>
 #include "./ui_mainwindow.h"
 #include <QGridLayout>
+//#include <QResizeEvent>
+
 
 
 QT_BEGIN_NAMESPACE
@@ -31,7 +33,10 @@ public:
         this->setPixmap(px);
         this->setScaledContents(true);
         this->setGeometry(geo);
-        this->setMaximumSize(QSize(120,120));
+//        this->setSizeIncrement(QSize(100,100));
+//        this->setMaximumSize(QSize(120,120));
+//       this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
         loc_x = x_;
         loc_y = y_;
         color = color_;
@@ -80,6 +85,8 @@ private:
 
     std::shared_ptr<board> chess_;
     QGridLayout *layout;
+    QWidget *centralWidget ;
+
     void makePiece(int color, int idx, std::string pic_name,
                    std::shared_ptr<gui_square> pos, int x, int y);
     std::shared_ptr<gui_square> squares_[8][8];
@@ -88,9 +95,9 @@ private:
     std::shared_ptr<gui_square> squre_pressed_ = nullptr;
     void buttonClicked(int x_, int y_);
     void checkPawnAtEnd(int x_, int y_);
-void secPress(int x_, int y_);
+    void secPress(int x_, int y_);
     void clearSuggestions();
-
+//    void resizeEvent(QResizeEvent *event);
     std::vector<std::array<int, 2>> available_moves =
             std::vector<std::array<int, 2>>();
     std::vector<std::array<int, 2>> old_places =
@@ -100,6 +107,7 @@ void secPress(int x_, int y_);
     team_color turn = white;
     bool black_up_;
     bool checkAvailable(int x, int y);
+
 };
 
 #endif // CHESS_GUI_H

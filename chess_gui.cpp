@@ -16,10 +16,44 @@ chess_gui::chess_gui(QWidget *parent)
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newGame);
     fileMenu->addAction(exitAct);
-    layout = new QGridLayout;
+    //    layout = new QGridLayout;
+    //    centralWidget = new QWidget(this);
+    //    layout->setSpacing(0);
 
+    //    centralWidget->setLayout(layout);
     newGameSlot();
+
+    //    setCentralWidget(centralWidget);
+    resize(QSize(150 * 8, 160 * 7 + 105));
 }
+
+// void chess_gui::resizeEvent(QResizeEvent *event) {
+//     QMainWindow::resizeEvent(event);
+//     int new_width = event->size().width();
+//     int new_height = event->size().height();
+//     for (int i = 0; i < 8; i++) {
+//         for (int j = 0; j < 8; j++) {
+//             int x = i * new_width / 8 + new_width / 16;
+//             int y = j * new_height / 8 + new_height / 16;
+//             int piece_width = new_width / 8;
+//             int piece_height = new_height / 8;
+//             squares_[i][j]->setGeometry(QRect(x, y, piece_width,
+//             piece_height));
+//         }
+//     }
+//     for (int i = 0; i < 16; i++) {
+//         int piece_width = new_width / 8;
+//         int piece_height = new_height / 8;
+//         w_team_[i]->setGeometry(QRect(w_team_[i]->x() * piece_width,
+//                                       w_team_[i]->y() * piece_height,
+//                                       piece_width, piece_height));
+//         b_team_[i]->setGeometry(QRect(b_team_[i]->x() * piece_width,
+//                                       b_team_[i]->y() * piece_height,
+//                                       piece_width, piece_height));
+//         w_team_[i]->show();
+//         b_team_[i]->show();
+//     }
+// }
 
 void chess_gui::newGameSlot() {
     for (int i = 0; i < 16; i++) {
@@ -34,11 +68,11 @@ void chess_gui::newGameSlot() {
     chess_.reset();
     initBoard();
     chess_ = std::make_shared<board>();
-
+    black_up_ = chess_->black_up;
     initTeam(1, !black_up_);
     initTeam(0, black_up_);
-    turn=white;
-     squre_pressed_ = nullptr;
+    turn = white;
+    squre_pressed_ = nullptr;
 }
 
 void chess_gui::initBoard() {
@@ -54,10 +88,21 @@ void chess_gui::initBoard() {
                         QPixmap(":/Resources/pics/JohnPablok Cburnett Chess set/PNGs/With "
                                 "Shadow/1024px/square brown light.png");
             }
+            double y_offeset = 25;
+            double square_size = 150;
             squares_[i][j] = std::make_shared<gui_square>(
                         this, Qt::WindowFlags(), pixmap,
-                        QRect(i * 100 + 100, j * 100 + 50, 100, 100), i, j);
+                        QRect(i * square_size, j * square_size + y_offeset, square_size,
+                              square_size),
+                        i, j);
+            //            layout->setRowStretch(i, 1);
+            //            layout->setColumnStretch(j, 1);
+            //            layout->addWidget(squares_[i][j].get(), j, i);
+
+            //            squares_[i][j]->setSizePolicy(QSizePolicy::Expanding,
+            //                                          QSizePolicy::Expanding);
             squares_[i][j]->show();
+
             connect(squares_[i][j].get(), &gui_square::clicked, this,
                     &chess_gui::buttonClicked);
         }
@@ -92,9 +137,14 @@ void chess_gui::makePiece(int color, int idx, std::string pic_name,
                 this, Qt::WindowFlags(),
                 QPixmap(dir.append(clr + pic_name + ".png").c_str()), square->geometry(),
                 x, y, color, pic_name);
+    //    layout->setRowStretch((*team)[idx]->loc_x, 1);
+    //    layout->setColumnStretch( (*team)[idx]->loc_y, 1);
+    //    layout->addWidget((*team)[idx].get(), (*team)[idx]->loc_y,
+    //                      (*team)[idx]->loc_x);
+
+    connect((*team)[idx].get(), &piece::clicked, this, &chess_gui::buttonClicked);
     square->piece_ = (*team)[idx];
     (*team)[idx]->show();
-    connect((*team)[idx].get(), &piece::clicked, this, &chess_gui::buttonClicked);
 }
 
 void chess_gui::move(int x, int y, int new_x, int new_y) {
