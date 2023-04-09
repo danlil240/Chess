@@ -223,6 +223,20 @@ void chess_gui::secPress(int x_, int y_) {
         checkPawnAtEnd(x_, y_);
         squre_pressed_ = nullptr;
         clearSuggestions();
+        if (chess_->game_state.state == game_states::checkmate) {
+            QMessageBox msgBox;
+            msgBox.setText("Check Mate!!! would you like to play another game?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            switch (ret) {
+            case QMessageBox::Yes:
+                newGameSlot();
+                break;
+            case QMessageBox::No:
+                close();
+                break;
+            }
+        }
     }
 }
 
