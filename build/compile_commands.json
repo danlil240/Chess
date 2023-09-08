@@ -1,0 +1,32 @@
+[
+{
+  "directory": "C:/Users/Daniel/Documents/QtChess/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64 @CMakeFiles/QtChess.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles/QtChess.dir/QtChess_autogen/mocs_compilation.cpp.obj -c C:/Users/Daniel/Documents/QtChess/build/QtChess_autogen/mocs_compilation.cpp",
+  "file": "C:/Users/Daniel/Documents/QtChess/build/QtChess_autogen/mocs_compilation.cpp"
+},
+{
+  "directory": "C:/Users/Daniel/Documents/QtChess/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64 @CMakeFiles/QtChess.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles/QtChess.dir/main.cpp.obj -c C:/Users/Daniel/Documents/QtChess/main.cpp",
+  "file": "C:/Users/Daniel/Documents/QtChess/main.cpp"
+},
+{
+  "directory": "C:/Users/Daniel/Documents/QtChess/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64 @CMakeFiles/QtChess.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles/QtChess.dir/board.cpp.obj -c C:/Users/Daniel/Documents/QtChess/board.cpp",
+  "file": "C:/Users/Daniel/Documents/QtChess/board.cpp"
+},
+{
+  "directory": "C:/Users/Daniel/Documents/QtChess/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64 @CMakeFiles/QtChess.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles/QtChess.dir/chess_gui.cpp.obj -c C:/Users/Daniel/Documents/QtChess/chess_gui.cpp",
+  "file": "C:/Users/Daniel/Documents/QtChess/chess_gui.cpp"
+},
+{
+  "directory": "C:/Users/Daniel/Documents/QtChess/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64 @CMakeFiles/QtChess.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles/QtChess.dir/optimizer.cpp.obj -c C:/Users/Daniel/Documents/QtChess/optimizer.cpp",
+  "file": "C:/Users/Daniel/Documents/QtChess/optimizer.cpp"
+},
+{
+  "directory": "C:/Users/Daniel/Documents/QtChess/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64 @CMakeFiles/QtChess.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles/QtChess.dir/QtChess_autogen/EWIEGA46WW/qrc_pics.cpp.obj -c C:/Users/Daniel/Documents/QtChess/build/QtChess_autogen/EWIEGA46WW/qrc_pics.cpp",
+  "file": "C:/Users/Daniel/Documents/QtChess/build/QtChess_autogen/EWIEGA46WW/qrc_pics.cpp"
+}
+]

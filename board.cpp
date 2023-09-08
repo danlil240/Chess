@@ -7,9 +7,7 @@ board::board() {
     black_up = 1;
     initSquares(squares_);
     initTeam(&pieces_, &squares_);
-    last_state_ = state_;
-
-    //    std::memcpy(&last_state_,&state_,sizeof(state_));
+    last_state_ = state;
 }
 
 board::~board() {}
@@ -24,7 +22,7 @@ void board::initSquares(std::shared_ptr<square> squares[8][8]) {
 
 void board::initTeam(std::array<std::shared_ptr<chess_piece>, 32>(*pieces),
                      std::shared_ptr<square> (*squeres)[8][8]) {
-    std::array<int, 2> y;
+    piece_position y;
     for (int j = 0; j < 2; j++) {
         team_color color = j ? black : white;
         bool up_down;
@@ -38,16 +36,16 @@ void board::initTeam(std::array<std::shared_ptr<chess_piece>, 32>(*pieces),
         int king_pos = black_up ? 3 : 4;
         int queen_pos = black_up ? 4 : 3;
         int first_idx = color ? 0 : 16;
-        state_[0 + first_idx] = {king_pos, y[0]};
-        state_[1 + first_idx] = {queen_pos, y[0]};
-        state_[2 + first_idx] = {0, y[0]};
-        state_[3 + first_idx] = {7, y[0]};
-        state_[4 + first_idx] = {1, y[0]};
-        state_[5 + first_idx] = {6, y[0]};
-        state_[6 + first_idx] = {2, y[0]};
-        state_[7 + first_idx] = {5, y[0]};
+        state[0 + first_idx] = {king_pos, y[0]};
+        state[1 + first_idx] = {queen_pos, y[0]};
+        state[2 + first_idx] = {0, y[0]};
+        state[3 + first_idx] = {7, y[0]};
+        state[4 + first_idx] = {1, y[0]};
+        state[5 + first_idx] = {6, y[0]};
+        state[6 + first_idx] = {2, y[0]};
+        state[7 + first_idx] = {5, y[0]};
         for (int i = 0; i < 8; i++) {
-            state_[i + 8 + first_idx] = {i, y[1]};
+            state[i + 8 + first_idx] = {i, y[1]};
         }
         (*pieces)[0 + first_idx] = std::make_shared<chess_piece>(king, color, dir);
         (*pieces)[1 + first_idx] = std::make_shared<chess_piece>(queen, color, dir);
@@ -66,10 +64,10 @@ void board::initTeam(std::array<std::shared_ptr<chess_piece>, 32>(*pieces),
                     std::make_shared<chess_piece>(pawn, color, dir);
         }
     }
-    updatePieces(state_);
+    updatePieces(state);
 }
 
-void board::updatePieces(std::array<std::array<int, 2>, 32> new_state) {
+void board::updatePieces(board_state new_state) {
 
     for (auto &row : squares_) {
         for (auto &square : row) {
@@ -94,8 +92,8 @@ void board::updatePieces(std::array<std::array<int, 2>, 32> new_state) {
     }
 }
 
-void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
-                          std::vector<std::array<int, 2>> &new_places,
+void board::updateSquares(piece_available_moves &old_places,
+                          piece_available_moves &new_places,
                           bool formal, piece_type_description new_type) {
     int old_x = old_places[0][0];
     int old_y = old_places[0][1];
@@ -120,9 +118,9 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
             victim->alive_ = false;
             victim->location_ = {-1, -1};
             if (formal) {
-                auto x = std::find(state_.begin(), state_.end(), new_places[0]);
-                if (x != state_.end()) {
-                    state_[x - state_.begin()] = {-1, -1};
+                auto x = std::find(state.begin(), state.end(), new_places[0]);
+                if (x != state.end()) {
+                    state[x - state.begin()] = {-1, -1};
                 }
             }
         }
@@ -156,9 +154,9 @@ void board::updateSquares(std::vector<std::array<int, 2>> &old_places,
                   << " turn.  Move number: " << moves_cnt << "  ************* "
                   << std::endl;
         for (int i = 0; i < old_places.size(); i++) {
-            auto x = std::find(state_.begin(), state_.end(), old_places[i]);
-            if (x != state_.end()) {
-                state_[x - state_.begin()] = new_places[i];
+            auto x = std::find(state.begin(), state.end(), old_places[i]);
+            if (x != state.end()) {
+                state[x - state.begin()] = new_places[i];
             }
         }
         turn = turn == white ? black : white;
@@ -188,7 +186,7 @@ bool board::checkForMate(team_color color) {
     for (int i = first; i < first + 16; i++) {
         if (!pieces_[i]->alive_)
             continue;
-        std::vector<std::array<int, 2>> available_moves;
+        piece_available_moves available_moves;
         checkAvailableMoves(pieces_[i]->location_[0], pieces_[i]->location_[1],
                 available_moves);
         if (available_moves.size())
@@ -197,7 +195,7 @@ bool board::checkForMate(team_color color) {
     return true;
 }
 
-void board::updatePawn(std::array<int, 2> &location,
+void board::updatePawn(piece_position &location,
                        piece_type_description new_type) {
     auto main_piece = squares_[location[0]][location[1]]->piece;
     if (main_piece->piece_type == pawn && (location[1] == 0 | location[1] == 7)) {
@@ -205,8 +203,8 @@ void board::updatePawn(std::array<int, 2> &location,
     }
 }
 
-void board::checkCastling(std::vector<std::array<int, 2>> &old_places,
-                          std::vector<std::array<int, 2>> &new_places) {
+void board::checkCastling(piece_available_moves &old_places,
+                          piece_available_moves &new_places) {
     int new_x = new_places[0][0]; // get x coordinate of new position
     int new_y = new_places[0][1]; // get y coordinate of new position
     int old_x = old_places[0][0];
@@ -246,7 +244,7 @@ void board::checkCastling(std::vector<std::array<int, 2>> &old_places,
 }
 
 bool board::checkAvailableMoves(
-        int x, int y, std::vector<std::array<int, 2>> &available_moves) {
+        int x, int y, piece_available_moves &available_moves) {
     //    std::cout << "available moves for square: " << x << ", " << y <<
     //    std::endl;
     available_moves.clear();
@@ -264,13 +262,13 @@ bool board::checkAvailableMoves(
         case pawn:
             //            std::cout << "pawn" << std::endl;
             if (!squares_[x][y + dir]->has_piece()) {
-                available_moves.push_back(std::array<int, 2>({x, y + dir}));
+                available_moves.push_back(piece_position({x, y + dir}));
             }
             if (x < 7) {
                 if (squares_[x + 1][y + dir]->has_piece()) {
                     if (squares_[x + 1][y + dir]->piece->color != color) {
                         available_moves.push_back(
-                                    std::array<int, 2>({x + 1, y + dir})); // attack
+                                    piece_position({x + 1, y + dir})); // attack
                     }
                 }
             }
@@ -278,7 +276,7 @@ bool board::checkAvailableMoves(
                 if (squares_[x - 1][y + dir]->has_piece()) {
                     if (squares_[x - 1][y + dir]->piece->color != color) {
                         available_moves.push_back(
-                                    std::array<int, 2>({x - 1, y + dir})); // attack
+                                    piece_position({x - 1, y + dir})); // attack
                     }
                 }
             }
@@ -286,7 +284,7 @@ bool board::checkAvailableMoves(
                 if (!squares_[x][y + 2 * dir]->has_piece() &&
                         !squares_[x][y + 1 * dir]->has_piece()) {
                     available_moves.push_back(
-                                std::array<int, 2>({x, y + 2 * dir})); // first double step
+                                piece_position({x, y + 2 * dir})); // first double step
                 }
             }
             break;
@@ -323,12 +321,12 @@ bool board::checkAvailableMoves(
                     if (squares_[(*it)[0]][(*it)[1]]->piece) {
                         if ((squares_[(*it)[0]][(*it)[1]]->piece->color != color)) {
                             available_moves.push_back(
-                                        std::array<int, 2>({(*it)[0], (*it)[1]})); // attack
+                                        piece_position({(*it)[0], (*it)[1]})); // attack
                         } else {
                             continue;
                         }
                     }
-                    available_moves.push_back(std::array<int, 2>({(*it)[0], (*it)[1]}));
+                    available_moves.push_back(piece_position({(*it)[0], (*it)[1]}));
                 }
             }
 
@@ -354,13 +352,13 @@ bool board::checkAvailableMoves(
                     if (squares_[(*it)[0]][(*it)[1]]->has_piece()) {
                         if (squares_[(*it)[0]][(*it)[1]]->piece->color != color) {
                             available_moves.push_back(
-                                        std::array<int, 2>({(*it)[0], (*it)[1]})); // king attack
+                                        piece_position({(*it)[0], (*it)[1]})); // king attack
                         } else {
                             continue;
                         }
                     }
                     available_moves.push_back(
-                                std::array<int, 2>({(*it)[0], (*it)[1]})); // free move
+                                piece_position({(*it)[0], (*it)[1]})); // free move
                 }
             }
             if (!piece->moved) {
@@ -385,11 +383,11 @@ bool board::checkAvailableMoves(
                 }
                 if (!squares_[x + r_rook][y]->piece->moved && r_clear &&
                         r_non_threats) {
-                    available_moves.push_back(std::array<int, 2>({x + 2, y}));
+                    available_moves.push_back(piece_position({x + 2, y}));
                 }
                 if (!squares_[x + l_rook][y]->piece->moved && l_clear &&
                         l_non_threats) {
-                    available_moves.push_back(std::array<int, 2>({x - 2, y}));
+                    available_moves.push_back(piece_position({x - 2, y}));
                 }
             }
             break;
@@ -400,10 +398,10 @@ bool board::checkAvailableMoves(
         if (verb)
             std::cout << "*****    Check checking!   ********" << std::endl;
 
-        std::vector<std::array<int, 2>> available_moves_temp;
+        piece_available_moves available_moves_temp;
         for (auto move : available_moves) {
-            std::vector<std::array<int, 2>> old_p;
-            std::vector<std::array<int, 2>> new_p;
+            piece_available_moves old_p;
+            piece_available_moves new_p;
             old_p = {{x, y}};
             new_p = {move};
             updateSquares(old_p, new_p, false);
@@ -413,7 +411,7 @@ bool board::checkAvailableMoves(
             if (!king_threaten) {
                 available_moves_temp.push_back(move);
             }
-            updatePieces(state_);
+            updatePieces(state);
         }
         available_moves = available_moves_temp;
     } else {
@@ -547,17 +545,17 @@ void board::updateThreatensSquares(int x, int y) {
 
 void board::checkDirection(int x, int y, int dx, int dy,
                            std::shared_ptr<chess_piece> piece,
-                           std::vector<std::array<int, 2>> &available_moves) {
+                           piece_available_moves &available_moves) {
     int new_x = x + dx;
     int new_y = y + dy;
     while (new_x >= 0 && new_x < 8 && new_y >= 0 && new_y < 8) {
         if (squares_[new_x][new_y]->has_piece()) {
             if (squares_[new_x][new_y]->piece->color != piece->color) {
-                available_moves.push_back(std::array<int, 2>({new_x, new_y}));
+                available_moves.push_back(piece_position({new_x, new_y}));
             }
             break;
         }
-        available_moves.push_back(std::array<int, 2>({new_x, new_y}));
+        available_moves.push_back(piece_position({new_x, new_y}));
         new_x += dx;
         new_y += dy;
     }

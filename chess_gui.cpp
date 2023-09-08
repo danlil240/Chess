@@ -68,6 +68,7 @@ void chess_gui::newGameSlot() {
     chess_.reset();
     initBoard();
     chess_ = std::make_shared<board>();
+    optimizer = std::make_shared<Optimizer>(chess_,3);
     black_up_ = chess_->black_up;
     initTeam(1, !black_up_);
     initTeam(0, black_up_);
@@ -160,6 +161,7 @@ void chess_gui::move(int x, int y, int new_x, int new_y) {
 }
 
 void chess_gui::buttonClicked(int x_, int y_) {
+    optimizer->compute(chess_->state);
     if (squares_[x_][y_]->piece_ and !squre_pressed_) {
         /// First press
         if (squares_[x_][y_]->piece_->color == turn) {
@@ -279,7 +281,7 @@ void chess_gui::checkPawnAtEnd(int x_, int y_) {
                 squares_[x_][y_]->piece_->name_ = "knight";
             }
             d.append(clr + pic_name + ".png");
-            std::array<int, 2> a = {x_, y_};
+            piece_position a = {x_, y_};
 
             chess_->updatePawn(a, piece_type);
             std::cout << d.toStdString() << std::endl;
@@ -298,7 +300,7 @@ void chess_gui::clearSuggestions() {
 }
 
 bool chess_gui::checkAvailable(int x, int y) {
-    std::array<int, 2> new_place = {x, y};
+    piece_position new_place = {x, y};
     auto it =
             std::find(available_moves.begin(), available_moves.end(), new_place);
     return it != available_moves.end();

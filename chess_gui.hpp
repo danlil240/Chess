@@ -12,7 +12,7 @@
 #include "./ui_mainwindow.h"
 #include <QGridLayout>
 //#include <QResizeEvent>
-
+#include "optimizer.hpp"
 
 
 QT_BEGIN_NAMESPACE
@@ -75,6 +75,7 @@ public:
     std::vector<int> waitToPress();
 
 private:
+    std::shared_ptr<Optimizer> optimizer;
     Ui::MainWindow *ui;
     QMenu *fileMenu;
     QAction *exitAct;
