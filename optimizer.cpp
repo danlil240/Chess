@@ -13,7 +13,7 @@ void Optimizer::compute(board_state state){
     for (int move_cnt=0; move_cnt<moves_ahead_;move_cnt++){
         team_available_moves all_available_moves;
         for (int i=0;i<16;i++){
-            piece_available_moves _piece_available_moves;
+            piece_position_arr _piece_available_moves;
             chess_->checkAvailableMoves(state[i][0],state[i][1],_piece_available_moves);
             all_available_moves[i]=_piece_available_moves;
         }

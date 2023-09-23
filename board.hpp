@@ -26,8 +26,8 @@ enum game_states{
 };
 
 typedef std::array<int, 2> piece_position;
-typedef std::vector<piece_position> piece_available_moves;
-typedef std::array<piece_available_moves,16> team_available_moves;
+typedef std::vector<piece_position> piece_position_arr;
+typedef std::array<piece_position_arr, 16> team_available_moves;
 typedef std::array<piece_position,32> board_state;
 
 
@@ -68,12 +68,11 @@ class board {
 public:
     board();
     ~board();
-    void updateSquares(piece_available_moves &old_places,
-                       piece_available_moves &new_places,
-                       bool formal = true,piece_type_description new_type = king);
+    void updateSquares(piece_position_arr &old_place,
+                       piece_position_arr &new_place, bool formal = true,
+                       piece_type_description new_type = king);
     void updatePawn(piece_position &location ,piece_type_description new_type = king);
-    bool checkAvailableMoves(int x, int y,
-                             piece_available_moves &available_moves);
+    bool checkAvailableMoves(int x, int y, piece_position_arr &available_moves);
     void updatePieces(std::array<std::array<int,2>,32> new_state);
     int black_up;
     gameState game_state;
@@ -91,14 +90,14 @@ private:
                       std::shared_ptr<chess_piece> piece);
     void checkDirection(int x, int y, int dx, int dy,
                         std::shared_ptr<chess_piece> piece,
-                        piece_available_moves &available_moves);
-    void checkCastling(piece_available_moves &old_places,
-                       piece_available_moves &new_places);
+                        piece_position_arr &available_moves);
+    void checkCastling(piece_position_arr &old_place,
+                       piece_position_arr &new_place);
     bool notThreaten(std::shared_ptr<square> square, team_color piece_color);
     bool checkForMate(team_color color);
     std::shared_ptr<square> squares_[8][8];
-    piece_available_moves knight_options_;
-    piece_available_moves king_options_;
+    piece_position_arr knight_options_;
+    piece_position_arr king_options_;
     int moves_cnt = 0;
     team_color turn = white;
 };
